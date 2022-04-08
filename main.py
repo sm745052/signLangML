@@ -9,7 +9,7 @@ import statistics
 import openai
 import pyttsx3
 import os
-openai.api_key = "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"
+openai.api_key = "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"
 # initialise the pyttsx3 engine 
 engine = pyttsx3.init() 
 os.environ['lastword'] = ''

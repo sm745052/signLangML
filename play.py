@@ -1,61 +1,62 @@
 import cv2
 import numpy as np
 import os
-import speech_recognition as sr  
-import os
+import speech_recognition as sr  # recognise speech
 import keyboard
 
-def show(x):
-    cap = cv2.VideoCapture('.\sign_images\{}'.format(x))
-    
-    # Check if camera opened successfully
-    if (cap.isOpened()== False): 
-        print("Error opening video  file")
-    
-    # Read until video is completed
-    while(cap.isOpened()):
+
+class play:
+    def __init__(self):
+        self.r = sr.Recognizer()                                                                                   
+    def show(self, x):
+        cap = cv2.VideoCapture('./sign_images/{}'.format(x))
         
-        # Capture frame-by-frame
-        ret, frame = cap.read()
-        if ret == True:
+        # Check if camera opened successfully
+        if (cap.isOpened()== False): 
+            print("Error opening video  file")
         
-            # Display the resulting frame
-            cv2.imshow('signs', frame)
+        # Read until video is completed
+        while(cap.isOpened()):
+            
+            # Capture frame-by-frame
+            ret, frame = cap.read()
+            if ret == True:
+            
+                # Display the resulting frame
+                try:
+                    ret, buffer = cv2.imencode('.jpg', cv2.flip(frame,1))
+                    frame = buffer.tobytes()
+                    yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+                except Exception as e:
+                    pass
+            # Break the loop
+            else: 
+                pass
         
-            if cv2.waitKey(25) & 0xFF == ord('q'):
-                break
-            # Press enter on keyboard to  exit
-            if keyboard.is_pressed("tab"):
-                break
+        # When everything done, release 
+        # the video capture object
+        cap.release()
     
-        # Break the loop
-        else: 
-            break
-    
-    # When everything done, release 
-    # the video capture object
-    cap.release()
-   
-# Closes all the frames
-# cv2.destroyAllWindows()
+    # Closes all the frames
+    # cv2.destroyAllWindows()
 
-# get audio from the microphone                                                                       
-r = sr.Recognizer()                                                                                   
-with sr.Microphone() as source:                                                                       
-    print("Speak:")                                                                                   
-    audio = r.listen(source)   
+    # get audio from the microphone                                                                       
+    def recognize(self):
+        r = self.r
+        with sr.Microphone() as source:                                                                       
+            print("Speak:")                                                                                   
+            # audio = r.listen(source)   
 
-try:
-    text = (r.recognize_google(audio))
-    print(text)
-    splitted_text = text.split(' ')
-    for i in splitted_text:
-        for j in os.listdir('./sign_images/'):
-            if j[:-4] == i:
-                show(j)
-except sr.UnknownValueError:
-    print("Could not understand audio")
-except sr.RequestError as e:
-    print("Could not request results; {0}".format(e))
-
-
+        try:
+            # text = (r.recognize_google(audio))
+            text = "how are you"
+            print(text)
+            splitted_text = text.split(' ')
+            for i in splitted_text:
+                for j in os.listdir('./sign_images/'):
+                    if j[:-4] == i:
+                        self.show(j)
+        except sr.UnknownValueError:
+            print("Could not understand audio")
+        except sr.RequestError as e:
+            print("Could not request results; {0}".format(e))

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+	<head>
+        <title>
+            DADA
+        </title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.4/socket.io.js" integrity="sha512-aMGMvNYu8Ue4G+fHa359jcPb1u+ytAF+P2SCb+PxrjCdO3n3ZTxJ30zuH39rimUggmTwmh2u7wvQsDTHESnmfQ==" crossorigin="anonymous"></script>
+    </head>
+	<body>
+		<script type="text/javascript">
+			var socket = io.connect('http://localhost:5000');
+			function changeOutput(x){
+				var element = document.getElementById("output");
+				element.innerHTML = x;
+			}
+			function changeFinalOutput(x){
+				var element = document.getElementById("final_output");
+				element.innerHTML = x;
+			}
+            $(document).ready(function(){
+                socket.on('connect', function(){
+                    socket.send('User has connected');
+                })
+                socket.on('message', function(msg) {
+					if(msg[0]=='$'){
+						changeFinalOutput(msg.substring(1));
+					}
+					else{
+						changeOutput(msg);
+					}
+                });
+            });
+        </script>
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-8  offset-lg-2">
+					<h2 class="mt-5">DADA Prototype</h2>
+					<form method="post" action="{{ url_for('tasks') }}">
+					<input type="submit" value="Stop/Start" name="stop" />
+					<input type="submit" value="Detect" name="detect" />
+					</form>
+					<img src="{{ url_for('video_feed') }}" height="80%">
+					<h2 id="output"></h2>
+					<h1 id="final_output"></h1>
+					<img src="{{ url_for('video_feed_1') }}" height="80%">
+				</div>
+			</div>
+		</div>
+		<p>
+			Keep the cursor on the input to use keyboard
+		</p>
+		<input type="text" size="50" onkeydown="myFunction(event)">
+		<p id="demo"></p>
+		<script>
+			function myFunction(event) {
+				var x = event.key;
+				socket.send(x);
+				document.getElementById("demo").innerHTML = "The pressed key was: " + x;
+			}
+		</script>
+	</body>
+</html>

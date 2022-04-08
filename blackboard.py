@@ -1,6 +1,6 @@
 import openai
 import numpy as np
-openai.api_key = "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"
+openai.api_key = "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"
 
 class Blackboard:
     def __init__(self):
